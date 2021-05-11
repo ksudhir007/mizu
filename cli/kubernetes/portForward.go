@@ -16,7 +16,7 @@ type PortForward struct {
 	stopChan chan struct{}
 }
 
-func NewPortForward(kubernetesProvider *Provider, namespace string, podName string, localPort uint16, podPort uint16, ctx context.Context) (*PortForward, error) {
+func NewPortForward(kubernetesProvider *Provider, namespace string, podName string, localPort uint16, podPort uint16, cancel context.CancelFunc) (*PortForward, error) {
 	dialer := getHttpDialer(kubernetesProvider, namespace, podName)
 	stopChan, readyChan := make(chan struct{}, 1), make(chan struct{}, 1)
 	out, errOut := new(bytes.Buffer), new(bytes.Buffer)
@@ -29,6 +29,7 @@ func NewPortForward(kubernetesProvider *Provider, namespace string, podName stri
 		err = forwarder.ForwardPorts() // this is blocking
 		if err != nil {
 			fmt.Printf("kubernetes port-forwarding error: %s", err)
+			cancel()
 		}
 	}()
 	return &PortForward{stopChan: stopChan}, nil
