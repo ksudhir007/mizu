@@ -91,7 +91,8 @@ func createPodAndPortForward(ctx context.Context, kubernetesProvider *kubernetes
 			}
 
 		case <- errorChan:
-			cancel()
+			fmt.Printf("Error occurded while wathcing the pod")
+			// cancel()
 
 		case <- ctx.Done():
 			if portForward != nil {

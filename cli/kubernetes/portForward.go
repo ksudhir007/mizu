@@ -17,7 +17,6 @@ type PortForward struct {
 }
 
 func NewPortForward(kubernetesProvider *Provider, namespace string, podName string, localPort uint16, podPort uint16, ctx context.Context) (*PortForward, error) {
-	retries := 0
 	dialer := getHttpDialer(kubernetesProvider, namespace, podName)
 	stopChan, readyChan := make(chan struct{}, 1), make(chan struct{}, 1)
 	out, errOut := new(bytes.Buffer), new(bytes.Buffer)
@@ -27,14 +26,10 @@ func NewPortForward(kubernetesProvider *Provider, namespace string, podName stri
 		return nil, err
 	}
 	go func() {
-		for ctx.Err() != nil && retries < 5 {
-			err = forwarder.ForwardPorts() // this is blocking
-			if err != nil {
-				retries += 1
-				fmt.Printf("kubernetes port-forwarding error: %s", err)
-			}
+		err = forwarder.ForwardPorts() // this is blocking
+		if err != nil {
+			fmt.Printf("kubernetes port-forwarding error: %s", err)
 		}
-		fmt.Printf("Stopping to retry port-forward")
 	}()
 	return &PortForward{stopChan: stopChan}, nil
 }
@@ -49,7 +44,7 @@ func getHttpDialer(kubernetesProvider *Provider, namespace string, podName strin
 		panic(err)
 	}
 	path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward", namespace, podName)
-	hostIP := strings.TrimLeft(kubernetesProvider.clientConfig.Host, "htps:/")
+	hostIP := strings.TrimLeft(kubernetesProvider.clientConfig.Host, "https://")
 	serverURL := url.URL{Scheme: "https", Path: path, Host: hostIP}
 
 	return spdy.NewDialer(upgrader, &http.Client{Transport: roundTripper}, http.MethodPost, &serverURL)
