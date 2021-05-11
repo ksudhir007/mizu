@@ -76,7 +76,7 @@ func createPodAndPortForward(ctx context.Context, kubernetesProvider *kubernetes
 			if modifiedPod.Status.Phase == "Running" && !isPodReady {
 				isPodReady = true
 				var err error
-				portForward, err = kubernetes.NewPortForward(kubernetesProvider, namespace, podName, config.Configuration.GuiPort, config.Configuration.MizuPodPort, cancel)
+				portForward, err = kubernetes.NewPortForward(kubernetesProvider, namespace, podName, config.Configuration.GuiPort, config.Configuration.MizuPodPort, ctx)
 				fmt.Printf("Web interface is now available at http://localhost:%d\n", config.Configuration.GuiPort)
 				if err != nil {
 					fmt.Printf("error forwarding port to pod %s\n", err)

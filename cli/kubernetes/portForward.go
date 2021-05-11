@@ -16,7 +16,8 @@ type PortForward struct {
 	stopChan chan struct{}
 }
 
-func NewPortForward(kubernetesProvider *Provider, namespace string, podName string, localPort uint16, podPort uint16, cancel context.CancelFunc) (*PortForward, error) {
+func NewPortForward(kubernetesProvider *Provider, namespace string, podName string, localPort uint16, podPort uint16, ctx context.Context) (*PortForward, error) {
+	retries := 0
 	dialer := getHttpDialer(kubernetesProvider, namespace, podName)
 	stopChan, readyChan := make(chan struct{}, 1), make(chan struct{}, 1)
 	out, errOut := new(bytes.Buffer), new(bytes.Buffer)
@@ -26,11 +27,14 @@ func NewPortForward(kubernetesProvider *Provider, namespace string, podName stri
 		return nil, err
 	}
 	go func() {
-		err = forwarder.ForwardPorts() // this is blocking
-		if err != nil {
-			fmt.Printf("kubernetes port-forwarding error: %s", err)
-			cancel()
+		for ctx.Err() != nil && retries < 5 {
+			err = forwarder.ForwardPorts() // this is blocking
+			if err != nil {
+				retries += 1
+				fmt.Printf("kubernetes port-forwarding error: %s", err)
+			}
 		}
+		fmt.Printf("Stopping to retry port-forward")
 	}()
 	return &PortForward{stopChan: stopChan}, nil
 }
