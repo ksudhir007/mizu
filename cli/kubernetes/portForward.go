@@ -9,7 +9,6 @@ import (
 	"k8s.io/client-go/transport/spdy"
 	"net/http"
 	"net/url"
-	"strings"
 )
 
 type PortForward struct {
@@ -45,8 +44,8 @@ func getHttpDialer(kubernetesProvider *Provider, namespace string, podName strin
 		panic(err)
 	}
 	path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward", namespace, podName)
-	hostIP := strings.TrimLeft(kubernetesProvider.clientConfig.Host, "https://")
-	serverURL := url.URL{Scheme: "https", Path: path, Host: hostIP}
+	parsed, _ := url.Parse(kubernetesProvider.clientConfig.Host)
+	serverURL := url.URL{Scheme: "https", Path: path, Host: parsed.Host}
 
 	return spdy.NewDialer(upgrader, &http.Client{Transport: roundTripper}, http.MethodPost, &serverURL)
 }
