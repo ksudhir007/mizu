@@ -15,12 +15,12 @@ _Note: TBD_
 ## Quick start
 Get your `mizu`:
 
-- Download your [**Mac** binary here](https://static.up9.com/mizu/main/darwin.amd64/mizu) or run 
+- for **Mac** - 
 ```
 curl -O https://static.up9.com/mizu/main/darwin.amd64/mizu && chmod 755 ./mizu
 ```
 
-- Download your [**Linux** binary here](https://static.up9.com/mizu/main/linux.amd64/mizu) or run 
+- for **Linux** - 
 ```
 curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu
 ```
@@ -73,4 +73,4 @@ _not implemented yet_
 
 
 ---
-version: 03
+version: 04
