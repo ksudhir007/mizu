@@ -13,14 +13,22 @@ Mizu is a tool that helps developers troubleshoot their web applications develop
 _Note: TBD_
 
 ## Quick start
-Download your `mizu`:
+Get your `mizu`:
 
-* for Mac run `curl -O https://static.up9.com/mizu/main/darwin.amd64/mizu && chmod 755 ./mizu`
-* for Linux run `curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu`
+- Download your [**Mac** binary here](https://static.up9.com/mizu/main/darwin.amd64/mizu) or run 
+```
+curl -O https://static.up9.com/mizu/main/darwin.amd64/mizu && chmod 755 ./mizu
+```
+
+- Download your [**Linux** binary here](https://static.up9.com/mizu/main/linux.amd64/mizu) or run 
+```
+curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu
+```
 
 
 Run `mizu` and supply Kubernetes pod name to tap, for example:
-```shell
+
+```
 mizu tap podname
 ```
 
