@@ -1,37 +1,66 @@
-## Welcome to GitHub Pages
+# Mizu
 
-You can use the [editor on GitHub](https://github.com/up9inc/mizu/edit/docs/docs/index.md) to maintain and preview the content for your website in Markdown files.
+## About
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Mizu is a tool that helps developers troubleshoot their web applications developed and running in Kubernetes environment. It allows user to instantly tap into any Kubernetes pod, collect and present its traffic in a developer-friendly way.
 
-### Markdown
+### Key features
+* simple and powerful CLI
+* no installation required
+* instantly capture HTTP requests sent to a given pod
+* decode and present any HTTP requests, REST and gRPC API calls.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+_Note: TBD_
 
-```markdown
-Syntax highlighted code block
+## Quick start
+Download your `mizu`:
 
-# Header 1
-## Header 2
-### Header 3
+* for Mac run `curl -O https://static.up9.com/mizu/main/darwin.amd64/mizu && chmod 755 ./mizu`
+* for Linux run `curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu`
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+Run `mizu` and supply Kubernetes pod name to tap, for example:
+```shell
+mizu tap podname
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+_Notes:_ you should have `kubectl` configured to run against your Kubernetes cluster.
 
-### Jekyll Themes
+After `mizu` starts and successfully connects to the specified pod, you point your browser [the traffic viewer web interface](http://localhost:8899/) which is available at [http://localhost:8899/](http://localhost:8899/) 
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/up9inc/mizu/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
-### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+## Commands and command-line arguments
+Usage and list of command-line arguments can be seen by running `mizu -h` or `mizu help`
+
+### `tap`
+Listen to the specified pod and display collected web traffic in the Web UI
+
+```
+Usage: mizu tap PODNAME [flags]
+
+Flags:
+  -p, --gui-port uint16     Provide a custom port for the web interface webserver (default 8899)
+  -h, --help                help for tap
+  -k, --kubeconfig string   Path to kubeconfig file
+      --mizu-image string   Custom image for mizu collector (default "gcr.io/up9-docker-hub/mizu/develop:latest")
+      --mizu-port uint16    Port which mizu cli will attempt to forward from the mizu collector pod (default 8899)
+  -n, --namespace string    Namespace selector
+```
+
+### `version`
+Display `mizu` version
+
+### `help`
+Display usage and help information
+
+### `view`
+_not implemented yet_
+Connect to running `mizu` listener and open traffic viewer UI in browser.
+
+
+### `fetch`
+_not implemented yet_
+Connect to running `mizu` listener and download collected web traffic files.
+
+
