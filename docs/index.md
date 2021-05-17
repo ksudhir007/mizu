@@ -8,12 +8,9 @@ Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside y
 
 
 ### Key features
-* simple and powerful CLI
-* no installation required
-* instantly capture HTTP requests sent to a given pod
-* decode and present any HTTP requests, REST and gRPC API calls.
-
-_Note: TBD_
+* Simple and powerful CLI
+* No installation or code instrumentation required
+* Real time decoding and presenting of any HTTP requests, REST and gRPC API calls.
 
 ## Quick start
 Get your `mizu`:
