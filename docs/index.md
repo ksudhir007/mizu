@@ -1,6 +1,6 @@
 Debug and troubleshoot your microservices with an open source tool that enables you to view the complete API traffic inside of your Kubernetes cluster. 
 
-Think TCPDump and Chrome Dev Tools combined to see what’s going on inside your Kubernetes cluster.
+Think TCPDump and Chrome Dev Tools combined.
 
 ## Key Features
 
@@ -10,7 +10,7 @@ Think TCPDump and Chrome Dev Tools combined to see what’s going on inside your
 * Works completely on premises (on-prem)
 
 ## Quick Start
-Get your `mizu`:
+Get `mizu`:
 
 - for **Mac** - 
 ```
