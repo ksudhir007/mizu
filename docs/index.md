@@ -39,11 +39,8 @@ After `mizu` starts and successfully connects to the specified pod, you point yo
 
 ![Mizu Local Webapp](img/mizu-snapshot.png)
 
-## Commands and command-line arguments
+## Command-line Arguments
 Usage and list of command-line arguments can be seen by running `mizu -h` or `mizu help`
-
-### `tap`
-Listen to the specified pod and display collected web traffic in the Web UI
 
 ```
 Usage: mizu tap PODNAME [flags]
@@ -55,13 +52,9 @@ Flags:
       --mizu-image string   Custom image for mizu collector (default "gcr.io/up9-docker-hub/mizu/develop:latest")
       --mizu-port uint16    Port which mizu cli will attempt to forward from the mizu collector pod (default 8899)
   -n, --namespace string    Namespace selector
+  
+Example: mizu tap front-end-794b5c7f6f-bvj54 -n sock-shop  
 ```
-
-### `version`
-Display `mizu` version
-
-### `help`
-Display usage and help information
 
 ---
 version: 04
