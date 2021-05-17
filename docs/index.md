@@ -10,7 +10,8 @@ Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside y
 ### Key features
 * Simple and powerful CLI
 * No installation or code instrumentation required
-* Real time decoding and presenting of any HTTP requests, REST and gRPC API calls.
+* Real time decoding and presenting of any HTTP requests, REST and gRPC API calls
+* Works completely on premisses (on-prem)
 
 ## Quick start
 Get your `mizu`:
