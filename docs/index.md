@@ -34,15 +34,12 @@ mizu tap <podname> [-n <namespace>]
 ```
 
 _Notes:_
-
-You should have `kubectl` configured to run against your Kubernetes cluster.
-
-Namespace is required in case the pod is in a different namespace than the default one.
+- You should have `kubectl` configured to run against your Kubernetes cluster.
+- Namespace is required in case the pod is in a different namespace than the default one.
 
 After `mizu` starts and successfully connects to the specified pod, you point your browser [the traffic viewer web interface](http://localhost:8899/) which is available at [http://localhost:8899/](http://localhost:8899/) 
 
 ![Mizu Local Webapp](img/mizu-snapshot.png)
-
 
 ## Commands and command-line arguments
 Usage and list of command-line arguments can be seen by running `mizu -h` or `mizu help`
