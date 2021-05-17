@@ -65,15 +65,5 @@ Display `mizu` version
 ### `help`
 Display usage and help information
 
-### `view`
-Connect to running `mizu` listener and open traffic viewer UI in browser.
-_not implemented yet_
-
-
-### `fetch`
-Connect to running `mizu` listener and download collected web traffic files.
-_not implemented yet_
-
-
 ---
 version: 04
