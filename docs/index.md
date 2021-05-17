@@ -30,7 +30,7 @@ curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu
 Run `mizu` and supply Kubernetes pod name to tap, for example:
 
 ```
-mizu tap podname
+mizu tap <podname>
 ```
 
 _Notes:_ you should have `kubectl` configured to run against your Kubernetes cluster.
