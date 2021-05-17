@@ -54,5 +54,14 @@ Flags:
 Example: mizu tap front-end-794b5c7f6f-bvj54 -n sock-shop  
 ```
 
+## Example: How to Get the Pod Name
+```
+kubectl get pods -A
+```
+![kubectl get pods](img/getpods.png)
+```
+mizu tap carts-db-69d4c5864f-kg84n -n sock-shop
+```
+
 ---
 version: 04
