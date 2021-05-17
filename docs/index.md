@@ -4,7 +4,7 @@
 
 Debug and troubleshoot your microservices with an open source tool that enables you to view the complete API traffic inside of your Kubernetes cluster. 
 
-Select the Kubernetes pods you want Mizu to observe to and you’ll see all of the API traffic in real time. Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside your Kubernetes cluster.
+Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside your Kubernetes cluster.
 
 
 ### Key features
