@@ -11,7 +11,7 @@ Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside y
 * Decode and present all HTTP requests, REST and gRPC API calls in real time
 * Works completely on premisses (on-prem)
 
-## Quick start
+## Quick Start
 Get your `mizu`:
 
 - for **Mac** - 
