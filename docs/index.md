@@ -4,6 +4,8 @@ Debug and troubleshoot your microservices with an open source tool that enables 
 
 Think of TCPDump and Chrome Dev Tools combined to see what’s going on inside your Kubernetes cluster.
 
+## Key Features
+
 * Simple and powerful CLI
 * No installation or code instrumentation required
 * Decode and present all HTTP requests, REST and gRPC API calls in real time
