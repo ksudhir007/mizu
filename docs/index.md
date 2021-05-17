@@ -7,7 +7,7 @@ Think TCPDump and Chrome Dev Tools combined to see what’s going on inside your
 * Simple and powerful CLI
 * No installation or code instrumentation required
 * Decode and present all HTTP requests, REST and gRPC API calls in real time
-* Works completely on premisses (on-prem)
+* Works completely on premises (on-prem)
 
 ## Quick Start
 Get your `mizu`:
