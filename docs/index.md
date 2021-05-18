@@ -1,6 +1,4 @@
-Debug and troubleshoot your microservices with an open source tool that enables you to view the complete API traffic inside of your Kubernetes cluster. 
-
-Think TCPDump and Chrome Dev Tools combined.
+Mizu is a simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump and Chrome Dev Tools combined.
 
 ## Key Features
 
