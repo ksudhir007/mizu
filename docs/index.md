@@ -8,7 +8,7 @@ A simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump and Chrom
 * `mizu` works completely on premises (on-prem)
 
 ## Quick Start
-`mizu` is a ~40MB program written in Go, you can download and run.
+`mizu` is a <50MB program written in Go, you can download and run.
 
 Download `mizu`:
 
