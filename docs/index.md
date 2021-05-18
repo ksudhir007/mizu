@@ -10,18 +10,17 @@ Mizu is a simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump a
 ## Quick Start
 Get `mizu`:
 
-- for **Mac** - 
+### Mac 
 ```
 curl -O https://static.up9.com/mizu/main/darwin.amd64/mizu && chmod 755 ./mizu
 ```
 
-- for **Linux** - 
+### Linux 
 ```
 curl -O https://static.up9.com/mizu/main/linux.amd64/mizu && chmod 755 ./mizu
 ```
 
-
-Run `mizu` and supply Kubernetes pod name to tap, for example:
+Run `mizu` with a Kubernetes pod name, for example:
 
 ```
 mizu tap <podname> [-n <namespace>]
