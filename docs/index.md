@@ -32,7 +32,7 @@ _Notes:_
 - You should have `kubectl` configured to run against your Kubernetes cluster
 - Namespace is required in case the pod is in a different namespace than the default one
 
-Point your browser to: [http://localhost:8899/](http://localhost:8899/) to see Mizu's standalone UI.
+Point your browser to: [http://localhost:8899/](http://localhost:8899/) to see `mizu`'s standalone UI.
 
 ![Mizu Local Webapp](img/mizu-snapshot.png)
 
