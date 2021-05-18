@@ -4,8 +4,8 @@ Mizu is a simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump a
 
 * Simple and powerful CLI
 * No installation or code instrumentation required
-* Decode and present all HTTP requests, REST and gRPC API calls in real time
-* Works completely on premises (on-prem)
+* View all HTTP requests, REST and gRPC API calls in real time
+* Mizu works completely on premises (on-prem)
 
 ## Quick Start
 Get `mizu`:
