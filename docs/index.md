@@ -1,4 +1,4 @@
-Mizu is a simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump and Chrome Dev Tools combined.
+A simple-yet-powerful API Traffic Viewer for Kubernetes. Think TCPDump and Chrome Dev Tools combined.
 
 ## Key Features
 
