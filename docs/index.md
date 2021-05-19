@@ -1,4 +1,4 @@
-A simple-yet-powerful API traffic viewer to help you <br/>troubleshoot and debug your microservices.
+A simple-yet-powerful API traffic viewer for Kubernetes <br/>to help you troubleshoot and debug your microservices.
 
 Think TCPDump and Chrome Dev Tools combined.
 
