@@ -10,7 +10,7 @@ Think TCPDump and Chrome Dev Tools combined.
 * `mizu` works completely on premises (on-prem)
 
 ## Quick Start
-`mizu` is a <50MB program (written in Golang) that you can download and run
+`mizu` is a <50MB program (written in Golang) that you can download and run.
 
 Download `mizu`:
 
