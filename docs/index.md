@@ -4,13 +4,13 @@ Think TCPDump and Chrome Dev Tools combined.
 
 ## Key Features
 
-* Real time view of all HTTP requests, REST and gRPC API calls
+* Real-time view of all HTTP requests, REST and gRPC API calls
 * Simple and powerful CLI
 * No installation or code instrumentation
 * `mizu` works completely on premises (on-prem)
 
 ## Quick Start
-`mizu` is a <50MB program written in Golang, you can download and run.
+`mizu` is a <50MB program (written in Golang) that you can download and run
 
 Download `mizu`:
 
@@ -34,7 +34,7 @@ _Notes:_
 - You should have `kubectl` configured to run against your Kubernetes cluster
 - Namespace is required in case the pod is in a different namespace than the default one
 
-Point your browser to: [http://localhost:8899/](http://localhost:8899/) to see `mizu`'s standalone UI.
+To see `mizu`'s standalone UI, point your browser to [http://localhost:8899/](http://localhost:8899/).
 
 ![Mizu Local Webapp](img/mizu-snapshot.png)
 
