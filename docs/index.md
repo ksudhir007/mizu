@@ -67,3 +67,27 @@ mizu tap carts-db-69d4c5864f-kg84n -n sock-shop
 ---
 version: 04
 
+
+### First tabs
+
+{% tabs log %}
+
+{% tab log php %}
+```php
+var_dump('hello');
+```
+{% endtab %}
+
+{% tab log js %}
+```javascript
+console.log('hello');
+```
+{% endtab %}
+
+{% tab log ruby %}
+```javascript
+pputs 'hello'
+```
+{% endtab %}
+
+{% endtabs %}
