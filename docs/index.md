@@ -50,7 +50,7 @@ View traffic of several pods, identified by a regular expression:
 ```
 mizu tap "(catalo*|front-end*)"
 ```
-The above command will observe traffic of the following pods:
+The above command will observe the traffic of the following pods as their names match the regular expression:
 - **catalo**gue-6676dc489b-6tx9h
 - **catalo**gue-db-69bd898747-7p8rq
 - **front-end**-946fd755f-8t6gp
