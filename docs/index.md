@@ -42,11 +42,11 @@ To see `mizu`'s standalone UI, point your browser to [http://localhost:8899/](ht
 Assuming this is my list of running pods:
 ![Running Kubernetes Pods](img/kubectl.png)
 
-View traffic of a specific pod, identified by the pod name:
+View API traffic of a specific pod, identified by the pod name:
 ```
 mizu tap catalogue-b87b45784-sxc8q
 ```
-View traffic of several pods, identified by a regular expression:
+View API traffic of several pods, identified by a regular expression:
 ```
 mizu tap "(catalo*|front-end*)"
 ```
@@ -54,6 +54,11 @@ The above command will observe the traffic of the following pods as their names 
 - **catalo**gue-6676dc489b-6tx9h
 - **catalo**gue-db-69bd898747-7p8rq
 - **front-end**-946fd755f-8t6gp
+
+View all API traffic:
+```
+mizu tap ".*"
+```
 
 ---
 version: 04
