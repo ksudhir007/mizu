@@ -12,16 +12,17 @@ interface HAREntry {
     url?: string;
     isCurrentRevision?: boolean;
     timestamp: Date;
+    color?: string
 }
 
 interface HAREntryProps {
     entry: HAREntry;
     setFocusedEntryId: (id: string) => void;
+    har: any;
     isSelected?: boolean;
 }
-
-export const HarEntry: React.FC<HAREntryProps> = ({entry, setFocusedEntryId, isSelected}) => {
-
+export const HarEntry: React.FC<HAREntryProps> = ({entry, setFocusedEntryId, har, isSelected}) => {
+    console.log(har)
     return <>
         <div id={entry.id} className={`${styles.row} ${isSelected ? styles.rowSelected : ''}`} onClick={() => setFocusedEntryId(entry.id)}>
             {entry.statusCode && <div>

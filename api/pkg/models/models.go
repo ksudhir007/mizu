@@ -2,10 +2,11 @@ package models
 
 import (
 	"encoding/json"
+	"time"
+
 	"github.com/google/martian/har"
 	"github.com/up9inc/mizu/shared"
 	"github.com/up9inc/mizu/tap"
-	"time"
 )
 
 type MizuEntry struct {
@@ -100,4 +101,56 @@ type ExtendedLog struct {
 type ExtendedCreator struct {
 	*har.Creator
 	Source string `json:"_source"`
+}
+
+// Enforce Policy
+
+type RulesPolicy struct {
+	Rules []RulePolicy `yaml:"rules"`
+}
+
+type RulePolicy struct {
+	Type    string `yaml:"type"`
+	Service string `yaml:"service"`
+	Path    string `yaml:"path"`
+	Method  string `yaml:"method"`
+	Key     string `yaml:"key"`
+	Value   string `yaml:"value"`
+	Latency int    `yaml:"latency"`
+	Name    string `yaml:"name"`
+}
+
+func (r RulePolicy) validateType() bool {
+	permitedTypes := []string{"json", "header"}
+	_, found := Find(permitedTypes, r.Type)
+	return found
+}
+
+func (rules RulesPolicy) ValidateRulesPolicy() []int {
+	invalidIndex := make([]int, 0)
+	for i := range rules.Rules {
+		validated := rules.Rules[i].validateType()
+		if !validated {
+			invalidIndex = append(invalidIndex, i)
+		}
+	}
+	return invalidIndex
+}
+
+func (rules *RulesPolicy) RemoveNotValidPolicy(idx int) {
+	rules.Rules = append(rules.Rules[:idx], rules.Rules[idx+1:]...)
+}
+
+func Find(slice []string, val string) (int, bool) {
+	for i, item := range slice {
+		if item == val {
+			return i, true
+		}
+	}
+	return -1, false
+}
+
+type FullEntryWithPolicy struct {
+	RulesMatched []map[string]bool `json:"rulesMatched,omitempty"`
+	Entry        har.Entry         `json:"entry"`
 }

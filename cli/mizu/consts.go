@@ -12,4 +12,5 @@ const (
 	AggregatorPodName   = "mizu-collector"
 	TapperPodName       = "mizu-tapper"
 	K8sAllNamespaces    = ""
+	ConfigMapName       = "mizu-policy"
 )

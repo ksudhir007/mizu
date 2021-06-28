@@ -3,13 +3,18 @@ package controllers
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/gofiber/fiber/v2"
-	"github.com/google/martian/har"
+	"io/ioutil"
 	"mizuserver/pkg/database"
 	"mizuserver/pkg/models"
 	"mizuserver/pkg/utils"
 	"mizuserver/pkg/validation"
+	"regexp"
+	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/google/martian/har"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -32,7 +37,6 @@ var (
 
 func GetEntries(c *fiber.Ctx) error {
 	entriesFilter := &models.EntriesFilter{}
-
 	if err := c.QueryParser(entriesFilter); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(err)
 	}
@@ -58,10 +62,10 @@ func GetEntries(c *fiber.Ctx) error {
 
 	// Convert to base entries
 	baseEntries := make([]models.BaseEntryDetails, 0, entriesFilter.Limit)
+	fmt.Println(baseEntries)
 	for _, entry := range entries {
 		baseEntries = append(baseEntries, utils.GetResolvedBaseEntry(entry))
 	}
-
 	return c.Status(fiber.StatusOK).JSON(baseEntries)
 }
 
@@ -192,12 +196,79 @@ func GetEntry(c *fiber.Ctx) error {
 	var fullEntry har.Entry
 	unmarshallErr := json.Unmarshal([]byte(entryData.Entry), &fullEntry)
 	utils.CheckErr(unmarshallErr)
-
+	rulesMatched := matchRequestPolicy(fullEntry)
 	if entryData.ResolvedDestination != "" {
 		fullEntry.Request.URL = utils.SetHostname(fullEntry.Request.URL, entryData.ResolvedDestination)
 	}
+	var fullEntryWithPolicy models.FullEntryWithPolicy
+	fullEntryWithPolicy.RulesMatched = rulesMatched
+	fullEntryWithPolicy.Entry = fullEntry
+	return c.Status(fiber.StatusOK).JSON(fullEntryWithPolicy)
+}
 
-	return c.Status(fiber.StatusOK).JSON(fullEntry)
+func matchRequestPolicy(fullEntry har.Entry) []map[string]bool {
+	enforcePolicy, _ := decodeEnforcePolicy()
+	resultPolicyToSend := []map[string]bool{}
+	for _, value := range enforcePolicy.Rules {
+		if value.Type == "json" {
+			var bodyJsonMap map[string]interface{}
+			err := json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
+			if err != nil {
+				var bodyJsonMap []interface{}
+				err := json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
+				if err != nil {
+					fmt.Println(err)
+				}
+			} else {
+				result := map[string]bool{}
+				if bodyJsonMap[value.Key] == value.Value {
+					fmt.Printf("%s matched with value %v", value.Name, value.Value)
+					result[value.Name] = true
+					resultPolicyToSend = append(resultPolicyToSend, result)
+				} else {
+					result[value.Name] = false
+					resultPolicyToSend = append(resultPolicyToSend, result)
+				}
+			}
+		} else if value.Type == "header" {
+			for j := range fullEntry.Response.Headers {
+				if strings.ToLower(fullEntry.Response.Headers[j].Name) == strings.ToLower(value.Key) {
+					matchValue, _ := regexp.MatchString(value.Value, fullEntry.Response.Headers[j].Value)
+					result := map[string]bool{}
+					if matchValue {
+						result[fullEntry.Response.Headers[j].Name] = true
+						resultPolicyToSend = append(resultPolicyToSend, result)
+					} else {
+						result[fullEntry.Response.Headers[j].Name] = false
+						resultPolicyToSend = append(resultPolicyToSend, result)
+					}
+				}
+			}
+		} else {
+
+		}
+	}
+	return resultPolicyToSend
+}
+
+func decodeEnforcePolicy() (models.RulesPolicy, error) {
+	content, err := ioutil.ReadFile("/app/enforce-policy/enforce-policy.yaml")
+	enforcePolicy := models.RulesPolicy{}
+	if err != nil {
+		return enforcePolicy, err
+	}
+	err = yaml.Unmarshal([]byte(content), &enforcePolicy)
+	if err != nil {
+		return enforcePolicy, err
+	}
+	invalidIndex := enforcePolicy.ValidateRulesPolicy()
+	if len(invalidIndex) != 0 {
+		for i := range invalidIndex {
+			fmt.Println("only json and header types are supported on rule")
+			enforcePolicy.RemoveNotValidPolicy(invalidIndex[i])
+		}
+	}
+	return enforcePolicy, nil
 }
 
 func DeleteAllEntries(c *fiber.Ctx) error {

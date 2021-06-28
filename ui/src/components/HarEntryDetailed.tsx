@@ -27,11 +27,10 @@ export const formatSize = (n: number) => n > 1000 ? `${Math.round(n / 1000)}KB` 
 
 const HarEntryTitle: React.FC<any> = ({har}) => {
     const classes = useStyles();
-
     const {log: {entries}} = har;
-    const {response, request, timings: {receive}} = entries[0];
-    const {status, statusText, bodySize} = response;
-
+        const {response, request, timings: {receive}} = entries[0].entry;
+        const {status, statusText, bodySize} = response;
+    console.log(entries)
 
     return <div className={classes.entryTitle}>
         {status && <div style={{marginRight: 8}}>
@@ -40,15 +39,16 @@ const HarEntryTitle: React.FC<any> = ({har}) => {
         <div style={{flexGrow: 1, overflow: 'hidden'}}>
             <EndpointPath method={request?.method} path={request?.url}/>
         </div>
-        <div style={{margin: "0 24px", opacity: 0.5}}>{formatSize(bodySize)}</div>
-        <div style={{marginRight: 24, opacity: 0.5}}>{status} {statusText}</div>
-        <div style={{opacity: 0.5}}>{Math.round(receive)}ms</div>
+        <div style={{margin: "0 20px", opacity: 0.5}}>{formatSize(bodySize)}</div>
+        <div style={{marginRight: 20, opacity: 0.5}}>{status} {statusText}</div>
+        <div style={{marginRight: 20, opacity: 0.5}}>{Math.round(receive)}ms</div>
+        <div style={{opacity: 0.5}}>{'rulesMatched' in entries[0] ? entries[0].rulesMatched?.length : '0'} Rules Applied</div>
     </div>;
 };
 
 export const HAREntryDetailed: React.FC<HarEntryDetailedProps> = ({classes, harEntry}) => {
     const har = singleEntryToHAR(harEntry);
-
+    console.log(har)
     return <>
         {har && <HarEntryTitle har={har}/>}
         <>

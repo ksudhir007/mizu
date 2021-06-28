@@ -95,7 +95,6 @@ func startReadingChannel(outputItems <-chan *tap.OutputChannelItem) {
 	if outputItems == nil {
 		panic("Channel of captured messages is nil")
 	}
-
 	for item := range outputItems {
 		saveHarToDb(item.HarEntry, item.ConnectionInfo.ClientIP)
 	}
@@ -107,7 +106,6 @@ func StartReadingOutbound(outboundLinkChannel <-chan *tap.OutboundLink) {
 	for range outboundLinkChannel {
 	}
 }
-
 
 func saveHarToDb(entry *har.Entry, sender string) {
 	entryBytes, _ := json.Marshal(entry)

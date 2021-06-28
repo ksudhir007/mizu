@@ -34,6 +34,58 @@ func RunMizuFetch(fetch *MizuFetchOptions) {
 
 }
 
+// func FilterRequests(body []byte) {
+// 	enforcePolicy, _ := decodeEnforcePolicy()
+// 	var HARFetched shared.HARFetched
+// 	err := json.Unmarshal(body, &HARFetched)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 	}
+// 	for key, entry := range HARFetched.Log.Entries {
+// 		response := entry.Response
+// 		for _, value := range enforcePolicy.Rules {
+// 			if value.Type == "json" {
+// 				var bodyJsonMap map[string]interface{}
+// 				err := json.Unmarshal(entry.Content.Text, &bodyJsonMap)
+// 				if err != nil {
+// 					var bodyJsonMap []interface{}
+// 					err := json.Unmarshal(entry.Content.Text, &bodyJsonMap)
+// 					if err != nil {
+// 						fmt.Println(err)
+// 					}
+// 				} else {
+// 					result := map[string]bool{}
+// 					if bodyJsonMap[value.Key] != value.Value {
+
+// 					}
+// 				}
+// 			} else {
+
+// 			}
+// 		}
+// 	}
+// }
+
+// func decodeEnforcePolicy() (shared.RulesPolicy, error) {
+// 	content, err := ioutil.ReadFile("/app/enforce-policy/enforce-policy.yaml")
+// 	enforcePolicy := shared.RulesPolicy{}
+// 	if err != nil {
+// 		return enforcePolicy, err
+// 	}
+// 	err = yaml.Unmarshal([]byte(content), &enforcePolicy)
+// 	if err != nil {
+// 		return enforcePolicy, err
+// 	}
+// 	invalidIndex := enforcePolicy.ValidateRulesPolicy()
+// 	if len(invalidIndex) != 0 {
+// 		for i := range invalidIndex {
+// 			fmt.Println("only json and header types are supported on rule")
+// 			enforcePolicy.RemoveNotValidPolicy(invalidIndex[i])
+// 		}
+// 	}
+// 	return enforcePolicy, nil
+// }
+
 func Unzip(reader *zip.Reader, dest string) error {
 	dest, _ = filepath.Abs(dest)
 	_ = os.MkdirAll(dest, os.ModePerm)

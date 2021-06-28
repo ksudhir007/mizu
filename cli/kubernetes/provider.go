@@ -6,9 +6,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/up9inc/mizu/cli/mizu"
 	"path/filepath"
 	"regexp"
+
+	"github.com/up9inc/mizu/cli/mizu"
 
 	"github.com/up9inc/mizu/shared"
 	core "k8s.io/api/core/v1"
@@ -76,6 +77,8 @@ func (provider *Provider) CreateMizuAggregatorPod(ctx context.Context, namespace
 	if err != nil {
 		return nil, err
 	}
+	configMapVolumeName := &core.ConfigMapVolumeSource{}
+	configMapVolumeName.Name = mizu.ConfigMapName
 	pod := &core.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      podName,
@@ -89,6 +92,13 @@ func (provider *Provider) CreateMizuAggregatorPod(ctx context.Context, namespace
 					Image:           podImage,
 					ImagePullPolicy: core.PullAlways,
 					Command:         []string{"./mizuagent", "--aggregator"},
+
+					VolumeMounts: []core.VolumeMount{
+						{
+							Name:      mizu.ConfigMapName,
+							MountPath: "/app/enforce-policy",
+						},
+					},
 					Env: []core.EnvVar{
 						{
 							Name:  shared.HostModeEnvVar,
@@ -98,6 +108,14 @@ func (provider *Provider) CreateMizuAggregatorPod(ctx context.Context, namespace
 							Name:  shared.MizuFilteringOptionsEnvVar,
 							Value: string(marshaledFilteringOptions),
 						},
+					},
+				},
+			},
+			Volumes: []core.Volume{
+				{
+					Name: mizu.ConfigMapName,
+					VolumeSource: core.VolumeSource{
+						ConfigMap: configMapVolumeName,
 					},
 				},
 			},
@@ -227,6 +245,28 @@ func (provider *Provider) RemoveDaemonSet(ctx context.Context, namespace string,
 	return provider.clientSet.AppsV1().DaemonSets(namespace).Delete(ctx, daemonSetName, metav1.DeleteOptions{})
 }
 
+func (provider *Provider) RemoveConfigMap(ctx context.Context, namespace string, configMapName string) error {
+	return provider.clientSet.CoreV1().ConfigMaps(namespace).Delete(ctx, configMapName, metav1.DeleteOptions{})
+}
+
+func (provider *Provider) ApplyConfigMap(ctx context.Context, namespace string, configMapName string, data string) error {
+	configMapData := make(map[string]string, 0)
+	configMapData["enforce-policy.yaml"] = data
+	configMap := &core.ConfigMap{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ConfigMap",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      configMapName,
+			Namespace: namespace,
+		},
+		Data: configMapData,
+	}
+	_, err := provider.clientSet.CoreV1().ConfigMaps(namespace).Create(ctx, configMap, metav1.CreateOptions{})
+	return err
+}
+
 func (provider *Provider) ApplyMizuTapperDaemonSet(ctx context.Context, namespace string, daemonSetName string, podImage string, tapperPodName string, aggregatorPodIp string, nodeToTappedPodIPMap map[string][]string, linkServiceAccount bool) error {
 	nodeToTappedPodIPMapJsonStr, err := json.Marshal(nodeToTappedPodIPMap)
 	if err != nil {
@@ -250,6 +290,9 @@ func (provider *Provider) ApplyMizuTapperDaemonSet(ctx context.Context, namespac
 				applyconfcore.ObjectFieldSelector().WithAPIVersion("v1").WithFieldPath("spec.nodeName"),
 			),
 		),
+	)
+	agentContainer.WithVolumeMounts(
+		applyconfcore.VolumeMount().WithName(mizu.ConfigMapName).WithMountPath("/app/enforce-policy"),
 	)
 
 	nodeNames := make([]string, 0, len(nodeToTappedPodIPMap))
@@ -276,6 +319,9 @@ func (provider *Provider) ApplyMizuTapperDaemonSet(ctx context.Context, namespac
 	noScheduleToleration.WithOperator(core.TolerationOpExists)
 	noScheduleToleration.WithEffect(core.TaintEffectNoSchedule)
 
+	volumes := applyconfcore.Volume()
+	volumes.WithName(mizu.ConfigMapName).WithConfigMap(applyconfcore.ConfigMapVolumeSource().WithName(mizu.ConfigMapName))
+
 	podSpec := applyconfcore.PodSpec()
 	podSpec.WithHostNetwork(true)
 	podSpec.WithDNSPolicy(core.DNSClusterFirstWithHostNet)
@@ -286,6 +332,7 @@ func (provider *Provider) ApplyMizuTapperDaemonSet(ctx context.Context, namespac
 	podSpec.WithContainers(agentContainer)
 	podSpec.WithAffinity(affinity)
 	podSpec.WithTolerations(noExecuteToleration, noScheduleToleration)
+	podSpec.WithVolumes(volumes)
 
 	podTemplate := applyconfcore.PodTemplateSpec()
 	podTemplate.WithLabels(map[string]string{"app": tapperPodName})

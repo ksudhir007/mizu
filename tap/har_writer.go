@@ -1,18 +1,23 @@
 package tap
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/martian/har"
+	"github.com/up9inc/mizu/shared"
+	yaml "gopkg.in/yaml.v2"
 )
 
 const readPermission = 0644
@@ -41,7 +46,7 @@ func openNewHarFile(filename string) *HarFile {
 }
 
 type HarFile struct {
-	file *os.File
+	file       *os.File
 	entryCount int
 }
 
@@ -53,6 +58,7 @@ func NewEntry(request *http.Request, requestTime time.Time, response *http.Respo
 	}
 
 	harResponse, err := har.NewResponse(response, true)
+
 	if err != nil {
 		SilentError("convert-response-to-har", "Failed converting response to HAR %s (%v,%+v)", err, err, err)
 		return nil, errors.New("Failed converting response to HAR")
@@ -88,18 +94,91 @@ func NewEntry(request *http.Request, requestTime time.Time, response *http.Respo
 
 	harEntry := har.Entry{
 		StartedDateTime: time.Now().UTC(),
-		Time: totalTime,
-		Request: harRequest,
-		Response: harResponse,
-		Cache: &har.Cache{},
+		Time:            totalTime,
+		Request:         harRequest,
+		Response:        harResponse,
+		Cache:           &har.Cache{},
 		Timings: &har.Timings{
-			Send: -1,
-			Wait: -1,
+			Send:    -1,
+			Wait:    -1,
 			Receive: totalTime,
 		},
 	}
-
+	var fullEntryWithPolicy FullEntryWithPolicy
+	fullEntryWithPolicy.RulesMatched = matchRequestPolicy(response)
+	fullEntryWithPolicy.Entry = harEntry
 	return &harEntry, nil
+}
+
+type FullEntryWithPolicy struct {
+	RulesMatched []map[string]bool `json:"rulesMatched,omitempty"`
+	Entry        har.Entry         `json:"entry"`
+}
+
+func matchRequestPolicy(response *http.Response) []map[string]bool {
+	enforcePolicy, _ := decodeEnforcePolicy()
+	var resultPolicyToSend []map[string]bool
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		fmt.Println(err)
+	}
+	x := bytes.TrimLeft(data, " \t\r\n")
+
+	isArray := len(x) > 0 && x[0] == '['
+	isObject := len(x) > 0 && x[0] == '{'
+	if isArray {
+		var bodyJsonMap []map[string]interface{}
+		_ = json.Unmarshal(data, &bodyJsonMap)
+		fmt.Println(bodyJsonMap)
+	} else if isObject {
+		var bodyJsonMap map[string]interface{}
+		_ = json.Unmarshal(data, &bodyJsonMap)
+		fmt.Println(bodyJsonMap)
+	} else {
+
+	}
+	for _, value := range enforcePolicy.Rules {
+		if value.Type == "json" {
+
+			// if bodyJsonMap[value.Key] == value.Value {
+			// 	fmt.Printf("%s matched with value %v", value.Name, value.Value)
+			// 	result := map[string]bool{}
+			// 	result[value.Name] = true
+			// 	resultPolicyToSend = append(resultPolicyToSend, result)
+			// }
+		} else if value.Type == "header" {
+			fmt.Println(response.Header.Get(value.Key))
+			matchValue, _ := regexp.MatchString(value.Value, response.Header.Get(value.Key))
+			if matchValue {
+				result := map[string]bool{}
+				result[value.Key] = true
+				resultPolicyToSend = append(resultPolicyToSend, result)
+			}
+		} else {
+
+		}
+	}
+	return resultPolicyToSend
+}
+
+func decodeEnforcePolicy() (shared.RulesPolicy, error) {
+	content, err := ioutil.ReadFile("/app/enforce-policy/enforce-policy.yaml")
+	enforcePolicy := shared.RulesPolicy{}
+	if err != nil {
+		return enforcePolicy, err
+	}
+	err = yaml.Unmarshal([]byte(content), &enforcePolicy)
+	if err != nil {
+		return enforcePolicy, err
+	}
+	invalidIndex := enforcePolicy.ValidateRulesPolicy()
+	if len(invalidIndex) != 0 {
+		for i := range invalidIndex {
+			fmt.Println("only json and header types are supported on rule")
+			enforcePolicy.RemoveNotValidPolicy(invalidIndex[i])
+		}
+	}
+	return enforcePolicy, nil
 }
 
 func (f *HarFile) WriteEntry(harEntry *har.Entry) {
@@ -138,14 +217,14 @@ func (f *HarFile) Close() {
 	}
 }
 
-func (f*HarFile) writeHeader() {
+func (f *HarFile) writeHeader() {
 	header := []byte(`{"log": {"version": "1.2", "creator": {"name": "Mizu", "version": "0.0.1"}, "entries": [`)
 	if _, err := f.file.Write(header); err != nil {
 		log.Panicf("Failed to write header to output file: %s (%v,%+v)", err, err, err)
 	}
 }
 
-func (f*HarFile) writeTrailer() {
+func (f *HarFile) writeTrailer() {
 	trailer := []byte("]}}")
 	if _, err := f.file.Write(trailer); err != nil {
 		log.Panicf("Failed to write trailer to output file: %s (%v,%+v)", err, err, err)
@@ -155,11 +234,11 @@ func (f*HarFile) writeTrailer() {
 func NewHarWriter(outputDir string, maxEntries int) *HarWriter {
 	return &HarWriter{
 		OutputDirPath: outputDir,
-		MaxEntries: maxEntries,
-		PairChan: make(chan *PairChanItem),
-		OutChan: make(chan *OutputChannelItem, 1000),
-		currentFile: nil,
-		done: make(chan bool),
+		MaxEntries:    maxEntries,
+		PairChan:      make(chan *PairChanItem),
+		OutChan:       make(chan *OutputChannelItem, 1000),
+		currentFile:   nil,
+		done:          make(chan bool),
 	}
 }
 
@@ -170,11 +249,11 @@ type OutputChannelItem struct {
 
 type HarWriter struct {
 	OutputDirPath string
-	MaxEntries int
-	PairChan chan *PairChanItem
-	OutChan chan *OutputChannelItem
-	currentFile *HarFile
-	done chan bool
+	MaxEntries    int
+	PairChan      chan *PairChanItem
+	OutChan       chan *OutputChannelItem
+	currentFile   *HarFile
+	done          chan bool
 }
 
 func (hw *HarWriter) WritePair(request *http.Request, requestTime time.Time, response *http.Response, responseTime time.Time, connectionInfo *ConnectionInfo) {
@@ -223,7 +302,7 @@ func (hw *HarWriter) Start() {
 			hw.closeFile()
 		}
 		hw.done <- true
-	} ()
+	}()
 }
 
 func (hw *HarWriter) Stop() {

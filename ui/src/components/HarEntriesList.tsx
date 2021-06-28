@@ -4,10 +4,13 @@ import styles from './style/HarEntriesList.module.sass';
 import spinner from './assets/spinner.svg';
 import ScrollableFeed from "react-scrollable-feed";
 import {StatusType} from "./HarFilters";
+import { singleEntryToHAR } from "./utils";
 
 interface HarEntriesListProps {
     entries: any[];
     setEntries: (entries: any[]) => void;
+    harEntry: any[];
+    setSelectedHarEntry: (harEntry: any[]) => void;
     focusedEntryId: string;
     setFocusedEntryId: (id: string) => void;
     connectionOpen: boolean;
@@ -25,10 +28,10 @@ enum FetchOperator {
     GT = "gt"
 }
 
-export const HarEntriesList: React.FC<HarEntriesListProps> = ({entries, setEntries, focusedEntryId, setFocusedEntryId, connectionOpen, noMoreDataTop, setNoMoreDataTop, noMoreDataBottom, setNoMoreDataBottom, methodsFilter, statusFilter, pathFilter}) => {
-
+export const HarEntriesList: React.FC<HarEntriesListProps> = ({entries, setEntries, harEntry, focusedEntryId, setFocusedEntryId, connectionOpen, noMoreDataTop, setNoMoreDataTop, noMoreDataBottom, setNoMoreDataBottom, methodsFilter, statusFilter, pathFilter}) => {
     const [loadMoreTop, setLoadMoreTop] = useState(false);
     const [isLoadingTop, setIsLoadingTop] = useState(false);
+    const har = singleEntryToHAR(harEntry);
 
     useEffect(() => {
         const list = document.getElementById('list').firstElementChild;
@@ -117,6 +120,7 @@ export const HarEntriesList: React.FC<HarEntriesListProps> = ({entries, setEntri
                         {filteredEntries.map(entry => <HarEntry key={entry.id}
                                                      entry={entry}
                                                      setFocusedEntryId={setFocusedEntryId}
+                                                     har={har}
                                                      isSelected={focusedEntryId === entry.id}/>)}
                         {!connectionOpen && !noMoreDataBottom && <div className={styles.fetchButtonContainer}>
                             <div className={styles.styledButton} onClick={() => getNewEntries()}>Fetch more entries</div>

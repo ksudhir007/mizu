@@ -21,6 +21,7 @@ require (
 	github.com/up9inc/mizu/tap v0.0.0
 	go.mongodb.org/mongo-driver v1.5.1
 	golang.org/x/net v0.0.0-20210421230115-4e50805a0758
+	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/sqlite v1.1.4
 	gorm.io/gorm v1.21.8
 	k8s.io/api v0.21.0
@@ -29,4 +30,5 @@ require (
 )
 
 replace github.com/up9inc/mizu/shared v0.0.0 => ../shared
+
 replace github.com/up9inc/mizu/tap v0.0.0 => ../tap

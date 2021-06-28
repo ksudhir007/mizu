@@ -130,6 +130,7 @@ interface HAREntrySectionProps {
 }
 
 export const HAREntryTableSection: React.FC<HAREntrySectionProps> = ({title, arrayToIterate}) => {
+    console.log(arrayToIterate)
     return <React.Fragment>
         {
             arrayToIterate && arrayToIterate.length > 0 ?

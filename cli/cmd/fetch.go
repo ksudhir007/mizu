@@ -29,4 +29,5 @@ func init() {
 	fetchCmd.Flags().Int64Var(&mizuFetchOptions.FromTimestamp, "from", 0, "Custom start timestamp for fetched entries")
 	fetchCmd.Flags().Int64Var(&mizuFetchOptions.ToTimestamp, "to", 0, "Custom end timestamp fetched entries")
 	fetchCmd.Flags().UintVarP(&mizuFetchOptions.MizuPort, "port", "p", 8899, "Custom port for mizu")
+	// fetchCmd.Flags().StringVarP(&mizuTapOptions.EnforcePolicyFile, "enforce-policy", "e", "", "Yaml file with policy rules")
 }

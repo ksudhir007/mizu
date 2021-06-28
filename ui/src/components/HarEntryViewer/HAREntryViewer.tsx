@@ -5,17 +5,21 @@ import {HAREntryTableSection, HAREntryBodySection} from "./HAREntrySections";
 
 const MIME_TYPE_KEY = 'mimeType';
 
-const HAREntryDisplay: React.FC<any> = ({entry, isCollapsed: initialIsCollapsed, isResponseMocked}) => {
+const HAREntryDisplay: React.FC<any> = ({har, entry, isCollapsed: initialIsCollapsed, isResponseMocked}) => {
     const {request, response} = entry;
-
+    const rulesMatched = har.log.entries[0].rulesMatched
     const TABS = [
         {tab: 'request'},
         {
             tab: 'response',
             badge: <>{isResponseMocked && <span className="smallBadge virtual mock">MOCK</span>}</>
         },
+        {
+            tab: 'Policies Matched',
+        },
     ];
 
+    const r = request
     const [currentTab, setCurrentTab] = useState(TABS[0].tab);
 
     return <div className={styles.harEntry}>
@@ -23,17 +27,17 @@ const HAREntryDisplay: React.FC<any> = ({entry, isCollapsed: initialIsCollapsed,
         {!initialIsCollapsed && <div className={styles.body}>
             <div className={styles.bodyHeader}>
                 <Tabs tabs={TABS} currentTab={currentTab} onChange={setCurrentTab} leftAligned/>
-                {request?.url && <a className={styles.endpointURL} href={request.url} target='_blank' rel="noreferrer">{request.url}</a>}
+                {r?.url && <a className={styles.endpointURL} href={r.url} target='_blank' rel="noreferrer">{r.url}</a>}
             </div>
             {
                 currentTab === TABS[0].tab && <React.Fragment>
-                    <HAREntryTableSection title={'Headers'} arrayToIterate={request.headers}/>
+                    <HAREntryTableSection title={'Headers'} arrayToIterate={r.headers}/>
 
-                    <HAREntryTableSection title={'Cookies'} arrayToIterate={request.cookies}/>
+                    <HAREntryTableSection title={'Cookies'} arrayToIterate={r.cookies}/>
 
-                    {request?.postData && <HAREntryBodySection content={request.postData} encoding={request.postData.comment} contentType={request.postData[MIME_TYPE_KEY]}/>}
+                    {r?.postData && <HAREntryBodySection content={r.postData} encoding={r.postData.comment} contentType={r.postData[MIME_TYPE_KEY]}/>}
 
-                    <HAREntryTableSection title={'Query'} arrayToIterate={request.queryString}/>
+                    <HAREntryTableSection title={'Query'} arrayToIterate={r.queryString}/>
                 </React.Fragment>
             }
             {currentTab === TABS[1].tab && <React.Fragment>
@@ -42,6 +46,9 @@ const HAREntryDisplay: React.FC<any> = ({entry, isCollapsed: initialIsCollapsed,
                 <HAREntryBodySection content={response.content} encoding={response.content?.encoding} contentType={response.content?.mimeType}/>
 
                 <HAREntryTableSection title={'Cookies'} arrayToIterate={response.cookies}/>
+            </React.Fragment>}
+            {currentTab === TABS[2].tab && <React.Fragment>
+                <HAREntryTableSection title={'Policy Name'} arrayToIterate={rulesMatched ? rulesMatched.map(z=>{return {name: Object.keys(z)[0], value:  z[Object.keys(z)[0]] ? 'Matched' : 'Not Matched'}}) : []}/>
             </React.Fragment>}
         </div>}
     </div>;
@@ -58,7 +65,7 @@ const HAREntryViewer: React.FC<Props> = ({harObject, className, isResponseMocked
     const {log: {entries}} = harObject;
     const isCollapsed = entries.length > 1;
     return <div className={`${className ? className : ''}`}>
-        {Object.keys(entries).map((entry: any, index) => <HAREntryDisplay isCollapsed={isCollapsed} key={index} entry={entries[entry]} isResponseMocked={isResponseMocked} showTitle={showTitle}/>)}
+        {Object.keys(entries).map((entry: any, index) => <HAREntryDisplay har={harObject} isCollapsed={isCollapsed} key={index} entry={entries[entry].entry} isResponseMocked={isResponseMocked} showTitle={showTitle}/>)}
     </div>
 };
 

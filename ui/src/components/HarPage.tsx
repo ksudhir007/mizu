@@ -45,7 +45,6 @@ export const HarPage: React.FC = () => {
     const [connection, setConnection] = useState(ConnectionStatus.Closed);
     const [noMoreDataTop, setNoMoreDataTop] = useState(false);
     const [noMoreDataBottom, setNoMoreDataBottom] = useState(false);
-
     const [methodsFilter, setMethodsFilter] = useState([]);
     const [statusFilter, setStatusFilter] = useState([]);
     const [pathFilter, setPathFilter] = useState("");
@@ -64,7 +63,6 @@ export const HarPage: React.FC = () => {
         ws.current.onmessage = e => {
             if(!e?.data) return;
             const message = JSON.parse(e.data);
-
             switch (message.messageType) {
                 case "entry":
                     const entry = message.data
@@ -154,6 +152,8 @@ export const HarPage: React.FC = () => {
                     />
                     <div className={styles.container}>
                         <HarEntriesList entries={entries}
+                                        harEntry={selectedHarEntry}
+                                        setSelectedHarEntry={setSelectedHarEntry}
                                         setEntries={setEntries}
                                         focusedEntryId={focusedEntryId}
                                         setFocusedEntryId={setFocusedEntryId}
