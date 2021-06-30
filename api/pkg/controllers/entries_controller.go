@@ -251,7 +251,7 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 						result.Rule = value
 						resultPolicyToSend = append(resultPolicyToSend, result)
 					} else {
-						result.Matched = true
+						result.Matched = false
 						result.Rule = value
 						resultPolicyToSend = append(resultPolicyToSend, result)
 					}

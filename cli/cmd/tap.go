@@ -52,5 +52,5 @@ func init() {
 	tapCmd.Flags().StringVarP(&mizuTapOptions.MizuImage, "mizu-image", "", "gcr.io/sample-customer-264515/mizu-ui:1", "Custom image for mizu collector")
 	tapCmd.Flags().Uint16VarP(&mizuTapOptions.MizuPodPort, "mizu-port", "", 8899, "Port which mizu cli will attempt to forward from the mizu collector pod")
 	tapCmd.Flags().StringArrayVarP(&mizuTapOptions.PlainTextFilterRegexes, "regex-masking", "r", nil, "List of regex expressions that are used to filter matching values from text/plain http bodies")
-	tapCmd.Flags().StringVarP(&mizuTapOptions.EnforcePolicyFile, "enforce-policy", "e", "", "Yaml file with policy rules")
+	tapCmd.Flags().StringVarP(&mizuTapOptions.EnforcePolicyFile, "validation-rules", "v", "", "Yaml file with policy rules")
 }
