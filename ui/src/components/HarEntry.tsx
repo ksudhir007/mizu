@@ -22,7 +22,6 @@ interface HAREntryProps {
     isSelected?: boolean;
 }
 export const HarEntry: React.FC<HAREntryProps> = ({entry, setFocusedEntryId, har, isSelected}) => {
-    console.log(har)
     return <>
         <div id={entry.id} className={`${styles.row} ${isSelected ? styles.rowSelected : ''}`} onClick={() => setFocusedEntryId(entry.id)}>
             {entry.statusCode && <div>

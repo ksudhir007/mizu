@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import styles from './HAREntryViewer.module.sass';
 import Tabs from "../Tabs";
-import {HAREntryTableSection, HAREntryBodySection} from "./HAREntrySections";
+import {HAREntryTableSection, HAREntryBodySection, HAREntryTablePolicySection} from "./HAREntrySections";
 
 const MIME_TYPE_KEY = 'mimeType';
 
 const HAREntryDisplay: React.FC<any> = ({har, entry, isCollapsed: initialIsCollapsed, isResponseMocked}) => {
-    const {request, response} = entry;
+    const {request, response, timings: {receive}} = entry;
     const rulesMatched = har.log.entries[0].rulesMatched
     const TABS = [
         {tab: 'request'},
@@ -48,7 +48,7 @@ const HAREntryDisplay: React.FC<any> = ({har, entry, isCollapsed: initialIsColla
                 <HAREntryTableSection title={'Cookies'} arrayToIterate={response.cookies}/>
             </React.Fragment>}
             {currentTab === TABS[2].tab && <React.Fragment>
-                <HAREntryTableSection title={'Policy Name'} arrayToIterate={rulesMatched ? rulesMatched.map(z=>{return {name: Object.keys(z)[0], value:  z[Object.keys(z)[0]] ? 'Matched' : 'Not Matched'}}) : []}/>
+                <HAREntryTablePolicySection title={'Policy Name'} latency={receive} response={response} arrayToIterate={rulesMatched ? rulesMatched : []}/>
             </React.Fragment>}
         </div>}
     </div>;

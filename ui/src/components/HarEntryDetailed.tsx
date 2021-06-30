@@ -30,7 +30,6 @@ const HarEntryTitle: React.FC<any> = ({har}) => {
     const {log: {entries}} = har;
         const {response, request, timings: {receive}} = entries[0].entry;
         const {status, statusText, bodySize} = response;
-    console.log(entries)
 
     return <div className={classes.entryTitle}>
         {status && <div style={{marginRight: 8}}>
@@ -48,7 +47,6 @@ const HarEntryTitle: React.FC<any> = ({har}) => {
 
 export const HAREntryDetailed: React.FC<HarEntryDetailedProps> = ({classes, harEntry}) => {
     const har = singleEntryToHAR(harEntry);
-    console.log(har)
     return <>
         {har && <HarEntryTitle har={har}/>}
         <>

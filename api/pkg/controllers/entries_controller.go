@@ -8,12 +8,13 @@ import (
 	"mizuserver/pkg/models"
 	"mizuserver/pkg/utils"
 	"mizuserver/pkg/validation"
+	"reflect"
 	"regexp"
-	"strings"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/martian/har"
+	jsonpath "github.com/yalp/jsonpath"
 	yaml "gopkg.in/yaml.v2"
 )
 
@@ -196,50 +197,62 @@ func GetEntry(c *fiber.Ctx) error {
 	var fullEntry har.Entry
 	unmarshallErr := json.Unmarshal([]byte(entryData.Entry), &fullEntry)
 	utils.CheckErr(unmarshallErr)
-	rulesMatched := matchRequestPolicy(fullEntry)
+	resultPolicyToSend := matchRequestPolicy(fullEntry)
 	if entryData.ResolvedDestination != "" {
 		fullEntry.Request.URL = utils.SetHostname(fullEntry.Request.URL, entryData.ResolvedDestination)
 	}
 	var fullEntryWithPolicy models.FullEntryWithPolicy
-	fullEntryWithPolicy.RulesMatched = rulesMatched
+	fullEntryWithPolicy.RulesMatched = resultPolicyToSend
 	fullEntryWithPolicy.Entry = fullEntry
 	return c.Status(fiber.StatusOK).JSON(fullEntryWithPolicy)
 }
 
-func matchRequestPolicy(fullEntry har.Entry) []map[string]bool {
+func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 	enforcePolicy, _ := decodeEnforcePolicy()
-	resultPolicyToSend := []map[string]bool{}
+	var resultPolicyToSend []models.RulesMatched
 	for _, value := range enforcePolicy.Rules {
 		if value.Type == "json" {
-			var bodyJsonMap map[string]interface{}
-			err := json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
+			var bodyJsonMap interface{}
+			_ = json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
+			fmt.Println("217 ", bodyJsonMap)
+			var result models.RulesMatched
+			out, err := jsonpath.Read(bodyJsonMap, value.Key)
 			if err != nil {
-				var bodyJsonMap []interface{}
-				err := json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
-				if err != nil {
-					fmt.Println(err)
-				}
+				fmt.Println("220 ", err)
+				continue
+			}
+			fmt.Println("222 ", out, " ", reflect.TypeOf(out))
+			var matchValue bool
+			if reflect.TypeOf(out).Kind() == reflect.String {
+				matchValue, err = regexp.MatchString(value.Value, out.(string))
 			} else {
-				result := map[string]bool{}
-				if bodyJsonMap[value.Key] == value.Value {
-					fmt.Printf("%s matched with value %v", value.Name, value.Value)
-					result[value.Name] = true
-					resultPolicyToSend = append(resultPolicyToSend, result)
-				} else {
-					result[value.Name] = false
-					resultPolicyToSend = append(resultPolicyToSend, result)
-				}
+				val := fmt.Sprint(out)
+				matchValue, err = regexp.MatchString(value.Value, val)
+			}
+			fmt.Println("225 ", matchValue)
+			if matchValue {
+				fmt.Printf("%s matched with value %v", value.Name, value.Value)
+				result.Matched = true
+				result.Rule = value
+				resultPolicyToSend = append(resultPolicyToSend, result)
+			} else {
+				result.Matched = false
+				result.Rule = value
+				resultPolicyToSend = append(resultPolicyToSend, result)
 			}
 		} else if value.Type == "header" {
 			for j := range fullEntry.Response.Headers {
-				if strings.ToLower(fullEntry.Response.Headers[j].Name) == strings.ToLower(value.Key) {
+				matchKey, _ := regexp.MatchString(value.Key, fullEntry.Response.Headers[j].Name)
+				if matchKey {
 					matchValue, _ := regexp.MatchString(value.Value, fullEntry.Response.Headers[j].Value)
-					result := map[string]bool{}
+					var result models.RulesMatched
 					if matchValue {
-						result[fullEntry.Response.Headers[j].Name] = true
+						result.Matched = true
+						result.Rule = value
 						resultPolicyToSend = append(resultPolicyToSend, result)
 					} else {
-						result[fullEntry.Response.Headers[j].Name] = false
+						result.Matched = true
+						result.Rule = value
 						resultPolicyToSend = append(resultPolicyToSend, result)
 					}
 				}

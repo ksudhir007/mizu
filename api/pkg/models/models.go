@@ -150,7 +150,12 @@ func Find(slice []string, val string) (int, bool) {
 	return -1, false
 }
 
+type RulesMatched struct {
+	Matched bool       `json:"matched"`
+	Rule    RulePolicy `json:"rule"`
+}
+
 type FullEntryWithPolicy struct {
-	RulesMatched []map[string]bool `json:"rulesMatched,omitempty"`
-	Entry        har.Entry         `json:"entry"`
+	RulesMatched []RulesMatched `json:"rulesMatched,omitempty"`
+	Entry        har.Entry      `json:"entry"`
 }

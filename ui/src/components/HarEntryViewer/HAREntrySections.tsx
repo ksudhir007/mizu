@@ -5,6 +5,7 @@ import CollapsibleContainer from "../CollapsibleContainer";
 import FancyTextDisplay from "../FancyTextDisplay";
 import Checkbox from "../Checkbox";
 import ProtobufDecoder from "protobuf-decoder";
+var jp = require('jsonpath');
 
 interface HAREntryViewLineProps {
     label: string;
@@ -130,7 +131,6 @@ interface HAREntrySectionProps {
 }
 
 export const HAREntryTableSection: React.FC<HAREntrySectionProps> = ({title, arrayToIterate}) => {
-    console.log(arrayToIterate)
     return <React.Fragment>
         {
             arrayToIterate && arrayToIterate.length > 0 ?
@@ -142,6 +142,92 @@ export const HAREntryTableSection: React.FC<HAREntrySectionProps> = ({title, arr
                         </tbody>
                     </table>
                 </HAREntrySectionContainer> : <span/>
+        }
+    </React.Fragment>
+}
+
+
+interface HAREntryPolicySectionProps {
+    title: string,
+    response: any,
+    latency?: number,
+    arrayToIterate: any[],
+}
+
+
+interface HAREntryPolicySectionCollapsibleTitleProps {
+    label: string;
+    matched: string;
+    isExpanded: boolean;
+}
+
+const HAREntryPolicySectionCollapsibleTitle: React.FC<HAREntryPolicySectionCollapsibleTitleProps> = ({label, matched, isExpanded}) => {
+    return <div className={styles.title}>
+        <span className={`${styles.button} ${isExpanded ? styles.expanded : ''}`}>
+            {isExpanded ? '-' : '+'}
+        </span>
+        <span>
+            <tr className={styles.dataLine}>
+            <td className={styles.dataKey}>{label}</td>
+            <td className={styles.dataKey}>{matched}</td>
+            </tr>
+        </span>
+    </div>
+}
+
+interface HAREntryPolicySectionContainerProps {
+    label: string;
+    matched: string;
+    children?: any;
+}
+
+export const HAREntryPolicySectionContainer: React.FC<HAREntryPolicySectionContainerProps> = ({label, matched, children}) => {
+    const [expanded, setExpanded] = useState(false);
+    return <CollapsibleContainer
+        className={styles.collapsibleContainer}
+        isExpanded={expanded}
+        onClick={() => setExpanded(!expanded)}
+        title={<HAREntryPolicySectionCollapsibleTitle label={label} matched={matched} isExpanded={expanded}/>}
+    >
+        {children}
+    </CollapsibleContainer>
+}
+
+export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = ({title, response, latency, arrayToIterate}) => {
+    console.log(response)
+    const base64ToJson = JSON.parse(Buffer.from(response.content.text, "base64").toString());
+    return <React.Fragment>
+        {
+            arrayToIterate && arrayToIterate.length > 0 ?
+                <>
+                <HAREntrySectionContainer title={title}>
+                    <table>
+                        <tbody>
+                            {arrayToIterate.map(({rule, matched}, index) => {
+                                    return (
+                                        // <HAREntryViewLine key={index} label={rule.Name} value={matched}/>
+                                        <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched ? "Matched" : "Not Matched"}>
+                                            {
+                                                matched ? <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <span className={styles.blueColor}>{rule.Value}</span></span>
+                                                : <>
+                                                    <span className={styles.dataValue}>Rule definition NOT matched on key <span className={styles.blueColor}>{rule.Key}</span></span>
+                                                    <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
+                                                    <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                  </>
+                                            }
+                                            {/* <tr className={styles.dataKey}>Latency expected: {rule.Latency} ms</tr>
+                                            <tr className={styles.latencyNotMatched}>Latency received: {latency} ms</tr> */}
+                                            
+                                        </HAREntryPolicySectionContainer>
+                                    )
+                                }
+                            )
+                            }
+                        </tbody>
+                    </table>
+                </HAREntrySectionContainer>
+                                            
+                </> : <span/>
         }
     </React.Fragment>
 }
