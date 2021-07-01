@@ -210,7 +210,12 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                         <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched ? "Matched" : "Not Matched"}>
                                             {
                                                 matched ? <>
-                                                <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <span className={styles.blueColor}>{rule.Value}</span></span>
+                                                <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <b>{rule.Value}</b></span>
+                                                {
+                                                    rule.Path != "" && matched ? 
+                                                    <span className={styles.dataValue}>Path: <b>{rule.Path}</b></span>
+                                                    : null
+                                                }
                                                 <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
                                                 {
                                                     rule.Type === "json" ?
@@ -219,7 +224,12 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                                 }
                                                 </>
                                                 : <>
-                                                    <span className={styles.dataValue}>Rule definition NOT matched on key <span className={styles.blueColor}>{rule.Key}</span></span>
+                                                    <span className={styles.dataValue}>Rule definition NOT matched on key <b>{rule.Key}</b></span>
+                                                    {
+                                                    rule.Path != "" && matched ? 
+                                                    <span className={styles.dataValue}>Path: <b>{rule.Path}</b></span>
+                                                    : null
+                                                }
                                                     <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
                                                     {
                                                         rule.Type === "json" ?
