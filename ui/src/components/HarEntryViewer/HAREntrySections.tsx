@@ -212,21 +212,16 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                                 matched ? <>
                                                 <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <b>{rule.Value}</b></span>
                                                 {
-                                                    rule.Path != "" && matched ? 
-                                                    <span className={styles.dataValue}>Path: <b>{rule.Path}</b></span>
+                                                    rule.Path != "" ? 
+                                                    <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
                                                     : null
                                                 }
                                                 <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
-                                                {
-                                                    rule.Type === "json" ?
-                                                    <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
-                                                    : null
-                                                }
                                                 </>
                                                 : <>
                                                     <span className={styles.dataValue}>Rule definition NOT matched on key <b>{rule.Key}</b></span>
                                                     {
-                                                    rule.Path != "" && matched ? 
+                                                    rule.Path != ""? 
                                                     <span className={styles.dataValue}>Path: <b>{rule.Path}</b></span>
                                                     : null
                                                 }
