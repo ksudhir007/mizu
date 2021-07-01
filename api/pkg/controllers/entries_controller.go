@@ -209,19 +209,27 @@ func GetEntry(c *fiber.Ctx) error {
 
 func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 	enforcePolicy, _ := decodeEnforcePolicy()
+	fmt.Println("212", fullEntry.Request.URL)
 	var resultPolicyToSend []models.RulesMatched
 	for _, value := range enforcePolicy.Rules {
 		if value.Type == "json" {
 			var bodyJsonMap interface{}
 			_ = json.Unmarshal(fullEntry.Response.Content.Text, &bodyJsonMap)
-			fmt.Println("217 ", bodyJsonMap)
 			var result models.RulesMatched
+			fmt.Println(value.Path)
+			if value.Path != "" {
+				matchPath, err := regexp.MatchString(value.Path, fullEntry.Request.URL)
+				fmt.Println(matchPath)
+				if err != nil || !matchPath {
+					fmt.Println(err)
+					continue
+				}
+			}
+
 			out, err := jsonpath.Read(bodyJsonMap, value.Key)
 			if err != nil {
-				fmt.Println("220 ", err)
 				continue
 			}
-			fmt.Println("222 ", out, " ", reflect.TypeOf(out))
 			var matchValue bool
 			if reflect.TypeOf(out).Kind() == reflect.String {
 				matchValue, err = regexp.MatchString(value.Value, out.(string))
@@ -229,9 +237,7 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 				val := fmt.Sprint(out)
 				matchValue, err = regexp.MatchString(value.Value, val)
 			}
-			fmt.Println("225 ", matchValue)
 			if matchValue {
-				fmt.Printf("%s matched with value %v", value.Name, value.Value)
 				result.Matched = true
 				result.Rule = value
 				resultPolicyToSend = append(resultPolicyToSend, result)

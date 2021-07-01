@@ -49,7 +49,7 @@ func init() {
 	tapCmd.Flags().StringVarP(&mizuTapOptions.Namespace, "namespace", "n", "", "Namespace selector")
 	tapCmd.Flags().BoolVarP(&mizuTapOptions.AllNamespaces, "all-namespaces", "A", false, "Tap all namespaces")
 	tapCmd.Flags().StringVarP(&mizuTapOptions.KubeConfigPath, "kube-config", "k", "", "Path to kube-config file")
-	tapCmd.Flags().StringVarP(&mizuTapOptions.MizuImage, "mizu-image", "", "gcr.io/sample-customer-264515/mizu-ui:1", "Custom image for mizu collector")
+	tapCmd.Flags().StringVarP(&mizuTapOptions.MizuImage, "mizu-image", "", "gcr.io/sample-customer-264515/mizu-ui:latest", "Custom image for mizu collector")
 	tapCmd.Flags().Uint16VarP(&mizuTapOptions.MizuPodPort, "mizu-port", "", 8899, "Port which mizu cli will attempt to forward from the mizu collector pod")
 	tapCmd.Flags().StringArrayVarP(&mizuTapOptions.PlainTextFilterRegexes, "regex-masking", "r", nil, "List of regex expressions that are used to filter matching values from text/plain http bodies")
 	tapCmd.Flags().StringVarP(&mizuTapOptions.EnforcePolicyFile, "validation-rules", "v", "", "Yaml file with policy rules")

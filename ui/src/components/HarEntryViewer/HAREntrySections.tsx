@@ -204,15 +204,28 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                     <table>
                         <tbody>
                             {arrayToIterate.map(({rule, matched}, index) => {
+                                console.log(rule)
                                     return (
                                         // <HAREntryViewLine key={index} label={rule.Name} value={matched}/>
                                         <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched ? "Matched" : "Not Matched"}>
                                             {
-                                                matched ? <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <span className={styles.blueColor}>{rule.Value}</span></span>
+                                                matched ? <>
+                                                <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <span className={styles.blueColor}>{rule.Value}</span></span>
+                                                <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
+                                                {
+                                                    rule.Type === "json" ?
+                                                    <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                    : null
+                                                }
+                                                </>
                                                 : <>
                                                     <span className={styles.dataValue}>Rule definition NOT matched on key <span className={styles.blueColor}>{rule.Key}</span></span>
                                                     <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
-                                                    <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                    {
+                                                        rule.Type === "json" ?
+                                                        <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                        : null
+                                                    }
                                                   </>
                                             }
                                             {/* <tr className={styles.dataKey}>Latency expected: {rule.Latency} ms</tr>
