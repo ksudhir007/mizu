@@ -121,7 +121,7 @@ type RulePolicy struct {
 }
 
 func (r RulePolicy) validateType() bool {
-	permitedTypes := []string{"json", "header"}
+	permitedTypes := []string{"json", "header", "latency"}
 	_, found := Find(permitedTypes, r.Type)
 	return found
 }

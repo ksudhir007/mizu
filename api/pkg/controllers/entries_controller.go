@@ -264,7 +264,18 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 				}
 			}
 		} else {
-
+			if value.Path != "" {
+				matchPath, err := regexp.MatchString(value.Path, fullEntry.Request.URL)
+				fmt.Println(matchPath)
+				if err != nil || !matchPath {
+					fmt.Println(err)
+					continue
+				}
+			}
+			var result models.RulesMatched
+			result.Matched = true
+			result.Rule = value
+			resultPolicyToSend = append(resultPolicyToSend, result)
 		}
 	}
 	return resultPolicyToSend
@@ -283,7 +294,7 @@ func decodeEnforcePolicy() (models.RulesPolicy, error) {
 	invalidIndex := enforcePolicy.ValidateRulesPolicy()
 	if len(invalidIndex) != 0 {
 		for i := range invalidIndex {
-			fmt.Println("only json and header types are supported on rule")
+			fmt.Println("only json, header and latency types are supported on rule")
 			enforcePolicy.RemoveNotValidPolicy(invalidIndex[i])
 		}
 	}

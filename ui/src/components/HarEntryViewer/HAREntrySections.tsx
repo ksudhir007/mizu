@@ -207,32 +207,50 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                 console.log(rule)
                                     return (
                                         // <HAREntryViewLine key={index} label={rule.Name} value={matched}/>
-                                        <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched ? "Matched" : "Not Matched"}>
+                                        <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched && (rule.Type === 'latency' ? rule.Latency > latency : true)? "Matched" : "Not Matched"}>
                                             {
-                                                matched ? <>
-                                                <span className={styles.dataValue}>Rule definition matched on key <b>{rule.Key}</b> with value <b>{rule.Value}</b></span>
-                                                {
-                                                    rule.Path != "" ? 
-                                                    <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
-                                                    : null
-                                                }
-                                                <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
-                                                </>
-                                                : <>
-                                                    <span className={styles.dataValue}>Rule definition NOT matched on key <b>{rule.Key}</b></span>
+                                                rule.Type === 'header' ?
+                                                <>
+                                                    <span className={styles.dataValue}>Rule definition <b>{matched ? 'matched' : 'not matched'}</b> on key <b>{rule.Key}</b> with value <b>{rule.Value}</b></span>
                                                     {
-                                                    rule.Path != ""? 
-                                                    <span className={styles.dataValue}>Path: <b>{rule.Path}</b></span>
-                                                    : null
-                                                }
-                                                    <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
-                                                    {
-                                                        rule.Type === "json" ?
-                                                        <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                        rule.Path != "" ? 
+                                                        <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
                                                         : null
                                                     }
-                                                  </>
-                                            }
+                                                </>
+                                                : rule.Type === 'json' ?
+                                                <>
+                                                    <span className={styles.dataValue}>Rule definition <b>{matched ? 'matched' : 'not matched'}</b> on key <b>{rule.Key}</b> with value <b>{rule.Value}</b></span>
+                                                    {
+                                                        rule.Path != "" ? 
+                                                        <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
+                                                        : null
+                                                    }
+                                                    <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
+                                                    { matched ?
+                                                        <tr className={styles.latencyMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                       :
+                                                       <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
+                                                    } 
+                                                </>
+                                                : rule.Type === 'latency' ?
+                                                <>
+                                                    {
+                                                        rule.Path != "" ? 
+                                                        <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
+                                                        : null
+                                                    }
+                                                    <tr className={styles.blueColor}>Expected: {rule.Latency} ms</tr>
+                                                    {
+                                                        latency <= rule.Latency ?
+                                                            <tr className={styles.blueColor}>Received: {latency} ms</tr>
+                                                        : <tr className={styles.blueColor}>Received: {latency} ms</tr>
+                                                    }
+                                                </>
+                                                :
+                                                <>
+                                                </>
+                                                }
                                             {/* <tr className={styles.dataKey}>Latency expected: {rule.Latency} ms</tr>
                                             <tr className={styles.latencyNotMatched}>Latency received: {latency} ms</tr> */}
                                             
