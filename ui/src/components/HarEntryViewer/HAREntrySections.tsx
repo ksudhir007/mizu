@@ -195,6 +195,7 @@ export const HAREntryPolicySectionContainer: React.FC<HAREntryPolicySectionConta
 }
 
 export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = ({service, title, response, latency, arrayToIterate}) => {
+console.log(response.content)
     const base64ToJson = response.content.mimeType === "application/json; charset=utf-8" ? JSON.parse(Buffer.from(response.content.text, "base64").toString()) : {};
     return <React.Fragment>
         {
