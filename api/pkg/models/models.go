@@ -40,6 +40,7 @@ type BaseEntryDetails struct {
 type EntryData struct {
 	Entry               string `json:"entry,omitempty"`
 	ResolvedDestination string `json:"resolvedDestination,omitempty" gorm:"column:resolvedDestination"`
+	Service             string `json:"service,omitempty"`
 }
 
 type EntriesFilter struct {
@@ -158,4 +159,5 @@ type RulesMatched struct {
 type FullEntryWithPolicy struct {
 	RulesMatched []RulesMatched `json:"rulesMatched,omitempty"`
 	Entry        har.Entry      `json:"entry"`
+	Service      string         `json:"service"`
 }

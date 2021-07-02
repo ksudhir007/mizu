@@ -148,6 +148,7 @@ export const HAREntryTableSection: React.FC<HAREntrySectionProps> = ({title, arr
 
 
 interface HAREntryPolicySectionProps {
+    service: string,
     title: string,
     response: any,
     latency?: number,
@@ -193,9 +194,8 @@ export const HAREntryPolicySectionContainer: React.FC<HAREntryPolicySectionConta
     </CollapsibleContainer>
 }
 
-export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = ({title, response, latency, arrayToIterate}) => {
-    console.log(response)
-    const base64ToJson = JSON.parse(Buffer.from(response.content.text, "base64").toString());
+export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = ({service, title, response, latency, arrayToIterate}) => {
+    const base64ToJson = response.content.mimeType === "application/json; charset=utf-8" ? JSON.parse(Buffer.from(response.content.text, "base64").toString()) : {};
     return <React.Fragment>
         {
             arrayToIterate && arrayToIterate.length > 0 ?
@@ -204,7 +204,6 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                     <table>
                         <tbody>
                             {arrayToIterate.map(({rule, matched}, index) => {
-                                console.log(rule)
                                     return (
                                         // <HAREntryViewLine key={index} label={rule.Name} value={matched}/>
                                         <HAREntryPolicySectionContainer key={index} label={rule.Name} matched={matched && (rule.Type === 'latency' ? rule.Latency > latency : true)? "Matched" : "Not Matched"}>
@@ -217,6 +216,11 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                                         <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
                                                         : null
                                                     }
+                                                    {
+                                                        rule.Service != "" ? 
+                                                        <tr className={styles.dataValue}>Service: <b>{service}</b></tr>
+                                                        : null
+                                                    }
                                                 </>
                                                 : rule.Type === 'json' ?
                                                 <>
@@ -226,8 +230,13 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                                         <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
                                                         : null
                                                     }
+                                                    {
+                                                        rule.Service != "" ? 
+                                                        <tr className={styles.dataValue}>Service: <b>{service}</b></tr>
+                                                        : null
+                                                    }
                                                     <tr className={styles.blueColor}>Expected: {rule.Value}</tr>
-                                                    { matched ?
+                                                    { matched  && response.content.mimeType === "application/json; charset=utf-8"?
                                                         <tr className={styles.latencyMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
                                                        :
                                                        <tr className={styles.latencyNotMatched}>Received: {jp.query(base64ToJson, rule.Key)}</tr>
@@ -238,6 +247,11 @@ export const HAREntryTablePolicySection: React.FC<HAREntryPolicySectionProps> = 
                                                     {
                                                         rule.Path != "" ? 
                                                         <tr className={styles.dataValue}>Path: <b>{rule.Path}</b></tr>
+                                                        : null
+                                                    }
+                                                    {
+                                                        rule.Service != "" ? 
+                                                        <tr className={styles.dataValue}>Service: <b>{service}</b></tr>
                                                         : null
                                                     }
                                                     <tr className={styles.blueColor}>Expected: {rule.Latency} ms</tr>

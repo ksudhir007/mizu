@@ -190,7 +190,7 @@ func GetFullEntries(c *fiber.Ctx) error {
 func GetEntry(c *fiber.Ctx) error {
 	var entryData models.EntryData
 	database.GetEntriesTable().
-		Select("entry", "resolvedDestination").
+		Select("entry", "resolvedDestination", "service").
 		Where(map[string]string{"entryId": c.Params("entryId")}).
 		First(&entryData)
 
@@ -204,6 +204,7 @@ func GetEntry(c *fiber.Ctx) error {
 	var fullEntryWithPolicy models.FullEntryWithPolicy
 	fullEntryWithPolicy.RulesMatched = resultPolicyToSend
 	fullEntryWithPolicy.Entry = fullEntry
+	fullEntryWithPolicy.Service = entryData.Service
 	return c.Status(fiber.StatusOK).JSON(fullEntryWithPolicy)
 }
 
@@ -221,6 +222,14 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 				matchPath, err := regexp.MatchString(value.Path, fullEntry.Request.URL)
 				fmt.Println(matchPath)
 				if err != nil || !matchPath {
+					fmt.Println(err)
+					continue
+				}
+			}
+			if value.Service != "" {
+				matchService, err := regexp.MatchString(value.Service, fullEntry.Request.URL)
+				fmt.Println(matchService)
+				if err != nil || !matchService {
 					fmt.Println(err)
 					continue
 				}
@@ -248,6 +257,22 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 			}
 		} else if value.Type == "header" {
 			for j := range fullEntry.Response.Headers {
+				if value.Path != "" {
+					matchPath, err := regexp.MatchString(value.Path, fullEntry.Request.URL)
+					fmt.Println(matchPath)
+					if err != nil || !matchPath {
+						fmt.Println(err)
+						continue
+					}
+				}
+				if value.Service != "" {
+					matchService, err := regexp.MatchString(value.Service, fullEntry.Request.URL)
+					fmt.Println(matchService)
+					if err != nil || !matchService {
+						fmt.Println(err)
+						continue
+					}
+				}
 				matchKey, _ := regexp.MatchString(value.Key, fullEntry.Response.Headers[j].Name)
 				if matchKey {
 					matchValue, _ := regexp.MatchString(value.Value, fullEntry.Response.Headers[j].Value)
@@ -268,6 +293,14 @@ func matchRequestPolicy(fullEntry har.Entry) []models.RulesMatched {
 				matchPath, err := regexp.MatchString(value.Path, fullEntry.Request.URL)
 				fmt.Println(matchPath)
 				if err != nil || !matchPath {
+					fmt.Println(err)
+					continue
+				}
+			}
+			if value.Service != "" {
+				matchService, err := regexp.MatchString(value.Service, fullEntry.Request.URL)
+				fmt.Println(matchService)
+				if err != nil || !matchService {
 					fmt.Println(err)
 					continue
 				}

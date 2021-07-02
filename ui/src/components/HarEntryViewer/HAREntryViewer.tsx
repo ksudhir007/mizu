@@ -7,6 +7,7 @@ const MIME_TYPE_KEY = 'mimeType';
 
 const HAREntryDisplay: React.FC<any> = ({har, entry, isCollapsed: initialIsCollapsed, isResponseMocked}) => {
     const {request, response, timings: {receive}} = entry;
+    console.log(har)
     const rulesMatched = har.log.entries[0].rulesMatched
     const TABS = [
         {tab: 'request'},
@@ -48,7 +49,7 @@ const HAREntryDisplay: React.FC<any> = ({har, entry, isCollapsed: initialIsColla
                 <HAREntryTableSection title={'Cookies'} arrayToIterate={response.cookies}/>
             </React.Fragment>}
             {currentTab === TABS[2].tab && <React.Fragment>
-                <HAREntryTablePolicySection title={'Policy Name'} latency={receive} response={response} arrayToIterate={rulesMatched ? rulesMatched : []}/>
+                <HAREntryTablePolicySection service={har.log.entries[0].service} title={'Policy Name'} latency={receive} response={response} arrayToIterate={rulesMatched ? rulesMatched : []}/>
             </React.Fragment>}
         </div>}
     </div>;
