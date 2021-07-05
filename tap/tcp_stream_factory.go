@@ -91,25 +91,32 @@ func (factory *tcpStreamFactory) WaitGoRoutines() {
 func (factory *tcpStreamFactory) getStreamProps(srcIP string, dstIP string, dstPort int) *streamProps {
 	if hostMode {
 		if inArrayString(gSettings.filterAuthorities, fmt.Sprintf("%s:%d", dstIP, dstPort)) == true {
+			Debug("getStreamProps %s", fmt.Sprintf("+ a1 %s:%d", dstIP, dstPort))
 			return &streamProps{isTapTarget: true, isOutgoing: false}
 		} else if inArrayString(gSettings.filterAuthorities, dstIP) == true {
+			Debug("getStreamProps %s", fmt.Sprintf("+ a2 %s", dstIP))
 			return &streamProps{isTapTarget: true, isOutgoing: false}
 		} else if *anydirection && inArrayString(gSettings.filterAuthorities, srcIP) == true {
+			Debug("getStreamProps %s", fmt.Sprintf("+ a3 %s", srcIP))
 			return &streamProps{isTapTarget: true, isOutgoing: true}
 		}
+		Debug("getStreamProps %s", fmt.Sprintf("- a4 %s -> %s:%d", srcIP, dstIP, dstPort))
 		return &streamProps{isTapTarget: false}
 	} else {
 		isTappedPort := dstPort == 80 || (gSettings.filterPorts != nil && (inArrayInt(gSettings.filterPorts, dstPort)))
 		if !isTappedPort {
+			Debug("getStreamProps %s", fmt.Sprintf("- b1 %d", dstPort))
 			return &streamProps{isTapTarget: false, isOutgoing: false}
 		}
 
 		isOutgoing := !inArrayString(ownIps, dstIP)
 
 		if !*anydirection && isOutgoing {
+			Debug("getStreamProps %s", fmt.Sprintf("- b2"))
 			return &streamProps{isTapTarget: false, isOutgoing: isOutgoing}
 		}
 
+		Debug("getStreamProps %s", fmt.Sprintf("+ b3 %s -> %s:%d", srcIP, dstIP, dstPort))
 		return &streamProps{isTapTarget: true}
 	}
 }
