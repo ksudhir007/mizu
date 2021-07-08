@@ -83,7 +83,6 @@ var staleTimeoutSeconds = flag.Int("staletimout", 120, "Max time in seconds to k
 var memprofile = flag.String("memprofile", "", "Write memory profile")
 
 // output
-var dumpToHar = flag.Bool("hardump", false, "Dump traffic to har files")
 var HarOutputDir = flag.String("hardir", "", "Directory in which to store output har files")
 var harEntriesPerFile = flag.Int("harentriesperfile", 200, "Number of max number of har entries to store in each file")
 
@@ -185,9 +184,7 @@ func StartPassiveTapper(opts *TapOpts) (<-chan *OutputChannelItem, <-chan *Outbo
 	hostMode = opts.HostMode
 
 	var harWriter *HarWriter
-	if *dumpToHar {
-		harWriter = NewHarWriter(*HarOutputDir, *harEntriesPerFile)
-	}
+	harWriter = NewHarWriter(*HarOutputDir, *harEntriesPerFile)
 	outboundLinkWriter := NewOutboundLinkWriter()
 
 	go startPassiveTapper(harWriter, outboundLinkWriter)
@@ -288,10 +285,8 @@ func startPassiveTapper(harWriter *HarWriter, outboundLinkWriter *OutboundLinkWr
 		}
 	}
 
-	if *dumpToHar {
-		harWriter.Start()
-		defer harWriter.Stop()
-	}
+	harWriter.Start()
+	defer harWriter.Stop()
 	defer outboundLinkWriter.Stop()
 
 	var dec gopacket.Decoder

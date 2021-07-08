@@ -311,7 +311,6 @@ func (provider *Provider) ApplyMizuTapperDaemonSet(ctx context.Context, namespac
 		"./mizuagent",
 		"-i", "any",
 		"--tap",
-		"--hardump",
 		"--aggregator-address", fmt.Sprintf("ws://%s/wsTapper", aggregatorPodIp),
 	}
 	if tapOutgoing {
