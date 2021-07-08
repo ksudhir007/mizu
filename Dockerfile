@@ -39,7 +39,5 @@ WORKDIR /app
 COPY --from=builder ["/app/api-build/mizuagent", "."]
 COPY --from=site-build ["/app/ui-build/build", "site"]
 
-COPY api/start.sh .
-
 # this script runs both apiserver and passivetapper and exits either if one of them exits, preventing a scenario where the container runs without one process
 ENTRYPOINT "/app/mizuagent"
