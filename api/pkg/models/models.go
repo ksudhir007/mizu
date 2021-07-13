@@ -90,17 +90,15 @@ func (fedex *FullEntryDetailsExtra) UnmarshalData(entry *MizuEntry) error {
 		return err
 	}
 
-	if entry.ResolvedSource != "" {
-		fedex.Entry.Request.Headers = append(fedex.Request.Headers, har.Header{Name: "x-mizu-source", Value: entry.ResolvedSource})
-	}
-	if entry.ResolvedDestination != "" {
-		fedex.Entry.Request.Headers = append(fedex.Request.Headers, har.Header{Name: "x-mizu-destination", Value: entry.ResolvedDestination})
-		fedex.Entry.Request.URL = utils.SetHostname(fedex.Entry.Request.URL, entry.ResolvedDestination)
-	}
+	// if entry.ResolvedSource != "" {
+	fedex.Entry.Request.Headers = append(fedex.Request.Headers, har.Header{Name: "x-mizu-source", Value: entry.ResolvedSource})
+	// }
+	// if entry.ResolvedDestination != "" {
+	fedex.Entry.Request.Headers = append(fedex.Request.Headers, har.Header{Name: "x-mizu-destination", Value: entry.ResolvedDestination})
+	fedex.Entry.Request.URL = utils.SetHostname(fedex.Entry.Request.URL, entry.ResolvedDestination)
+	//}
 	return nil
 }
-
-
 
 type EntryData struct {
 	Entry               string `json:"entry,omitempty"`
